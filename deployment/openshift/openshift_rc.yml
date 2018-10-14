@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: blue-green
+    labels:
+      app: bluegreenservice    
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentconfig: blue-green
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: blue-green
+    labels:
+      app: bluegreenservice    
+  spec:
+    to:
+      kind: Service
+      name: blue-green
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    labels:
+      app: bluegreenservice
+    name: bluegreenservice-1
+  spec:
+    replicas: 2
+    selector:
+      app: bluegreenservice
+      deployment: bluegreenservice-1
+      deploymentconfig: blue-green
+    template:
+      metadata:
+        labels:
+          app: bluegreenservice
+          deployment: bluegreenservice-1
+          deploymentconfig: blue-green
+      spec:
+        containers:
+        - env:
+          - name: deployment
+            value: blue
+          image: docker-registry.default.svc:5000/blue-green/bluegreenservice:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          name: bluegreenservice
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+        strategy:
+          type: Rolling
+          rollingParams:
+            intervalSeconds: 1
+            maxSurge: 0
+            maxUnavailable: 25%
+            timeoutSeconds: 600
+            updatePeriodSeconds: 60

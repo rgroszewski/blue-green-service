@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bluegreen-deploy
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels: 
+      app: bluegreen-app
+  template:
+    metadata:
+      labels:
+        app: bluegreen-app
+    spec:
+      containers:
+      - name: bluegreen-pod
+        image: rg/blue-green-service:0.0.1-SNAPSHOT
+        imagePullPolicy: Never
+        env:
+        - name: deployment
+          value: "green"        
+        ports:
+          - containerPort: 8080

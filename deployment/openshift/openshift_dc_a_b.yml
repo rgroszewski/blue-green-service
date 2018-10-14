@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: blue
+    labels:
+      app: bluegreenservice
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentconfig: blue
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: blue
+    labels:
+      app: bluegreenservice
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: blue
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          deploymentconfig: blue
+      spec:
+        containers:
+        - env:
+          - name: deployment
+            value: purple
+          image: docker-registry.default.svc:5000/blue-green/bluegreenservice:0.0.1-SNAPSHOT
+          name: bluegreenservice-blue
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: blue
+    labels:
+      app: bluegreenservice
+  spec:
+    to:
+      kind: Service
+      name: blue
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: green
+    labels:
+      app: bluegreenservice
+  spec:
+    to:
+      kind: Service
+      name: green
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: blue-green
+    labels:
+      app: bluegreenservice
+  spec:
+    to:
+      kind: Service
+      name: green
+      weight: 90
+    alternateBackends:
+      - kind: Service
+        name: blue
+        weight: 90
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: green
+    labels:
+      app: bluegreenservice
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentconfig: green
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: green
+    labels:
+      app: bluegreenservice
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: green
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          deploymentconfig: green
+      spec:
+        containers:
+        - env:
+          - name: deployment
+            value: green
+          image: docker-registry.default.svc:5000/blue-green/bluegreenservice:0.0.1-SNAPSHOT
+          name: bluegreenservice-green
+          ports:
+          - containerPort: 8080
+            protocol: TCP

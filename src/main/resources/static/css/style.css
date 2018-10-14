@@ -1,0 +1,35 @@
+.foo {
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.bar {
+  width: 100px;
+}
+
+.blue {
+  background: #13b4ff;
+}
+
+.green {
+  background: #13ffb4;
+}
+
+.purple {
+  background: #ab3fdd;
+}
+
+.font {
+  font-family: arial, sans-serif;
+  font-size: 24px;
+  color: #ffffff;
+  font-style: normal;
+  font-weight: bold;
+  font-variant: normal;
+  text-align: center;
+  horizontal-align: center;
+  letter-spacing: 0px;
+  line-height: 100px;
+  height: 100px;
+}
